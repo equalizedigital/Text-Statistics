@@ -31,8 +31,16 @@ class Text
             return self::$clean[$key];
         }
 
-        $encoding = mb_detect_encoding($strText);
-        $strText  = mb_convert_encoding($strText, 'UTF-8', !empty($encoding) ? $encoding : null);
+        // store original text for fallback
+		$originalText = $strText;
+		// try to detect encoding and convert it to UTF-8
+		$encoding = mb_detect_encoding($strText, mb_detect_order(), false);
+		$strText  = mb_convert_encoding($strText, 'UTF-8', !empty($encoding) ? $encoding : null);
+
+		// if we really can't figure out an encoding then use the original text.
+		if (false === $strText) {
+			$str_text = $originalText;
+		}
 
         // Curly quotes etc
         $strText = str_replace(
